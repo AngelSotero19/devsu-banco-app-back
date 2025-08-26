@@ -1,0 +1,30 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: 123*Devsu
+      ACCEPT_EULA: Y
+    ports:
+     - "1434:1433"
+    networks:
+     - devsu-network
+  api:
+    build:
+      context: .          
+      dockerfile: ./Dockerfile
+    container_name: banco-api
+    env_file:
+      - ./.env
+    environment:
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERT_PASSWORD}
+    ports:
+      - "7094:7094"
+      - "8080:8080"
+    volumes:
+      - ./certs/aspnetapp.pfx:/https/aspnetapp.pfx:ro
+    restart: unless-stopped
+    networks:
+     - devsu-network
+networks:
+  devsu-network:
